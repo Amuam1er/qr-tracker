@@ -5,7 +5,7 @@ import csv
 import time
 from uuid import uuid4
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # Make sure qr_codes folder exists
 os.makedirs('qr_codes', exist_ok=True)
@@ -78,5 +78,5 @@ def stats():
 
     return render_template('stats.html', scans=scans)
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     app.run(debug=True)
