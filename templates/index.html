@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Generate Dynamic QR Code</h1>
+    <form method="POST">
+        <input type="url" name="url" placeholder="Enter URL" required>
+        <button type="submit">Generate QR Code</button>
+    </form>
+
+    {% if qr_path %}
+    <h2>Your QR Code:</h2>
+    <img src="{{ url_for('static', filename='../' + qr_path) }}" alt="QR Code" width="250">
+    {% endif %}
+
+    <br><br>
+    <a href="/stats">View Scan Stats</a>
+</body>
+</html>

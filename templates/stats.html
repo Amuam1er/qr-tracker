@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Scan Stats</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Scan Logs</h1>
+    <table border="1">
+        <tr>
+            <th>QR Code ID</th>
+            <th>Original URL</th>
+            <th>Time Scanned</th>
+            <th>IP Address</th>
+        </tr>
+        {% for scan in scans %}
+        <tr>
+            <td>{{ scan.id }}</td>
+            <td>{{ scan.original_url }}</td>
+            <td>{{ scan.timestamp }}</td>
+            <td>{{ scan.ip }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br><br>
+    <a href="/">Generate More</a>
+</body>
+</html>
