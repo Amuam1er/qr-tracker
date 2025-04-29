@@ -1,13 +1,20 @@
 # Dynamic QR Code Generator with Tracking
 
-Simple Flask app that generates QR codes linking to a redirect endpoint and tracks how many times they've been scanned.
+![Made with Flask](https://img.shields.io/badge/Made%20with-Flask-blue)
+![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![Status](https://img.shields.io/badge/Status-Completed-brightgreen)
+
+---
+
+Simple Flask web app to create dynamic QR codes and track scan activity.
 
 ## Features
-- Dynamic QR codes (server-based redirects)
-- Scan logging (time, IP address)
-- Scan stats dashboard
+- Generate QR codes dynamically
+- Track scans (time, IP address)
+- View simple scan stats dashboard
 
-## Setup
+## Setup Instructions
+
 ```bash
 git clone https://github.com/Amuam1er/qr-tracker.git
 cd qr-tracker
