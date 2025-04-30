@@ -14,10 +14,10 @@
     </form>
 
     {% if qr_image %}
-        <h2>Generated QR Code:</h2>
-        <img src="{{ qr_image }}" alt="QR Code" width="200"><br><br>
-        <strong>Share this trackable link:</strong><br>
-        <a href="{{ short_link }}">{{ short_link }}</a>
-    {% endif %}
+    <h2>Generated QR Code:</h2>
+    <img src="{{ url_for('serve_qr', filename=qr_image.split('/')[-1]) }}" alt="QR Code" width="200"><br><br>
+    <strong>Share this trackable link:</strong><br>
+    <a href="{{ short_link }}">{{ short_link }}</a>
+{% endif %}
 </body>
 </html>
