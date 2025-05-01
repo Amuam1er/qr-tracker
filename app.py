@@ -1,82 +1,75 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file
-import qrcode
 import os
 import csv
-import time
-from uuid import uuid4
+import uuid
+import qrcode
+from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# Make sure qr_codes folder exists
-os.makedirs('qr_codes', exist_ok=True)
+# Ensure folders exist
+os.makedirs(os.path.join("static", "qr_codes"), exist_ok=True)
 
-# Log file
-LOG_FILE = 'scan_logs.csv'
-
-# Initialize CSV if not exist
-if not os.path.exists(LOG_FILE):
-    with open(LOG_FILE, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["id", "original_url", "timestamp", "ip"])
-
-# Home page: generate QR
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        original_url = request.form['url']
-        unique_id = str(uuid4())
+    return render_template("index.html")
 
-        # Create QR Code that links to /redirect/<id>
-        qr_link = request.host_url + 'redirect/' + unique_id
-        qr_img = qrcode.make(qr_link)
-        qr_path = f'qr_codes/{unique_id}.png'
-        qr_img.save(qr_path)
+@app.route('/', methods=['POST'])
+def generate_qr():
+    url = request.form['url']
+    label = request.form['label']
 
-        # Save original URL to a dictionary file
-        with open('url_mappings.csv', mode='a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow([unique_id, original_url])
+    # Generate unique QR code ID and short link
+    qr_id = str(uuid.uuid4())[:8]
+    short_path = f"/qr/{qr_id}"
+    full_link = request.host_url.rstrip('/') + short_path
 
-        return render_template('index.html', qr_path=qr_path)
+    # Save QR code to static/qr_codes/
+    filename = f"{qr_id}.png"
+    qr_folder = os.path.join("static", "qr_codes")
+    qr_path = os.path.join(qr_folder, filename)
+    img = qrcode.make(full_link)
+    img.save(qr_path)
 
-    return render_template('index.html', qr_path=None)
+    # Log creation
+    with open('scan_logs.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([datetime.now(), request.remote_addr, label, url, qr_id, 'created'])
 
-# Redirection and logging
-@app.route('/redirect/<id>')
-def redirect_to_url(id):
-    # Find URL
-    try:
-        with open('url_mappings.csv', mode='r') as f:
-            reader = csv.reader(f)
-            url_dict = {rows[0]: rows[1] for rows in reader}
-        
-        if id in url_dict:
-            original_url = url_dict[id]
+    return render_template("index.html", qr_image=filename, short_link=full_link)
 
-            # Log the scan
-            with open(LOG_FILE, mode='a', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow([id, original_url, time.strftime("%Y-%m-%d %H:%M:%S"), request.remote_addr])
+@app.route('/qr/<qr_id>')
+def redirect_qr(qr_id):
+    # Find the matching QR code from the log
+    with open('scan_logs.csv', 'r') as file:
+        reader = csv.reader(file)
+        rows = list(reader)
 
-            return redirect(original_url)
-        else:
-            return "Invalid QR Code ID.", 404
-    except Exception as e:
-        return f"Error: {str(e)}", 500
+    destination_url = None
+    label = None
+    for row in reversed(rows):
+        if row[4] == qr_id and row[5] == 'created':
+            destination_url = row[3]
+            label = row[2]
+            break
 
-# View scan stats
+    if destination_url:
+        # Log the scan
+        with open('scan_logs.csv', 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([datetime.now(), request.remote_addr, label, destination_url, qr_id, 'scanned'])
+        return redirect(destination_url)
+    else:
+        return "QR code not found", 404
+
 @app.route('/stats')
 def stats():
-    scans = []
-    try:
-        with open(LOG_FILE, mode='r') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                scans.append(row)
-    except Exception as e:
-        return f"Error: {str(e)}", 500
-
-    return render_template('stats.html', scans=scans)
+    logs = []
+    if os.path.exists("scan_logs.csv"):
+        with open("scan_logs.csv", newline='') as file:
+            reader = csv.reader(file)
+            logs = list(reader)
+    return render_template("stats.html", logs=logs)
 
 if __name__ == '__main__':
     app.run(debug=True)
