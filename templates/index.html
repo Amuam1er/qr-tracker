@@ -1,28 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>QR Code Generator with Tracking</title>
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Generate a Trackable QR Code</h1>
-    <form method="POST">
-        <label for="label">Label:</label><br>
-        <input type="text" name="label" required><br><br>
+    <h1>QR Code Generator</h1>
 
-        <label for="url">URL:</label><br>
-        <input type="url" name="url" required><br><br>
+    <form method="POST">
+        <label for="label">Label:</label>
+        <input type="text" id="label" name="label" required>
+
+        <label for="url">URL:</label>
+        <input type="url" id="url" name="url" required>
 
         <button type="submit">Generate QR Code</button>
     </form>
 
-    {% if qr_image %}
-        <h2>Generated QR Code:</h2>
-        <img src="{{ url_for('static', filename='qr_codes/' + qr_image) }}" alt="QR Code" width="200"><br><br>
-        <strong>Share this trackable link:</strong><br>
-        <a href="{{ short_link }}">{{ short_link }}</a>
+    {% if qr_code %}
+    <div class="qr-section">
+        <h2>Your QR Code:</h2>
+        <img src="{{ url_for('static', filename='qr_codes/' + qr_code) }}" alt="Generated QR Code">
+
+        <p>
+            <a href="{{ url_for('static', filename='qr_codes/' + qr_code) }}" download>Download QR Code</a>
+        </p>
+
+        <p>Your trackable link:
+            <a href="{{ short_link }}" target="_blank">{{ short_link }}</a>
+        </p>
+    </div>
     {% endif %}
 
-    <br><br>
-    <a href="/stats">View Stats</a>
+    <div style="text-align:center; margin-top:20px;">
+        <a href="{{ url_for('stats') }}">View Stats</a>
+    </div>
 </body>
 </html>
