@@ -23,6 +23,23 @@
         </tr>
         {% endfor %}
     </table>
+    <h2>Scan Count Summary</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Label</th>
+            <th>Scan Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for label, count in scan_summary %}
+        <tr>
+            <td>{{ label }}</td>
+            <td>{{ count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
     <br><br>
     <a href="/">Generate More</a>
 </body>
