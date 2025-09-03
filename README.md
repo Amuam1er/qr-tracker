@@ -13,10 +13,3 @@ Simple Flask web app to create dynamic QR codes and track scan activity.
 - Track scans (time, IP address)
 - View simple scan stats dashboard
 
-## Setup Instructions
-
-```bash
-git clone https://github.com/Amuam1er/qr-tracker.git
-cd qr-tracker
-pip install -r requirements.txt
-python app.py
